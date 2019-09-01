@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+   <!-- autowire byType -->
+<!--   <bean id="textEditor" class="com.yfshi.class012.TextEditor" autowire="byType">-->
+<!--      <property name="text" value="Text, Wood, SuperMen" />-->
+<!--      <property name="generateType" value="autoWire = byName" />-->
+<!--   </bean>-->
+   <!-- autowire byType -->
+   <!--   <bean id="textEditor2" class="com.yfshi.class012.TextEditor" autowire="byType">-->
+   <!--      <property name="text" value="Text, Wood, SuperMen, byType" />-->
+   <!--      <property name="generateType" value="autoWire = byType" />-->
+   <!--   </bean>-->
+
+   <!--   &lt;!&ndash; autowire constructor &ndash;&gt;-->
+      <bean id="textEditor3" class="com.yfshi.class012.TextEditor" autowire="constructor">
+         <constructor-arg index="1" value = "autoWire = constructor" />
+         <constructor-arg value = "Text, Wood, SuperMen, byType" />
+          <property name="text" value="Text, Wood, SuperMen" />
+          <property name="generateType" value="autoWire = byType" />
+      </bean>
+
+   <bean id="spellChecker" class="com.yfshi.class012.SpellChecker">
+      <property name="wordsList">
+         <list>
+            <value>text</value>
+            <value>wood</value>
+            <value>superman</value>
+         </list>
+      </property>
+   </bean>
+
+   <bean id="spellChecker2" class="com.yfshi.class012.SpellChecker" autowire-candidate="false">
+      <property name="wordsList">
+         <list>
+            <value>text</value>
+            <value>wood</value>
+            <value>superman</value>
+         </list>
+      </property>
+   </bean>
+
+
+
+</beans>

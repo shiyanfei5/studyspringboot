@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="anotherBean" class="com.yfshi.class006.AnotherBean"/>
+
+    <bean id = "bean1" class="com.yfshi.class006.Bean" >
+        <constructor-arg index="0" name="anotherBean"
+                         type="com.yfshi.class006.AnotherBean"
+                         ref="anotherBean">
+        </constructor-arg>
+        <constructor-arg index="1" name="string"
+                         type="java.lang.String"
+                         value="aaaa">
+        </constructor-arg>
+        <property name="anotherBean1" ref="anotherBean"/>
+        <property name="string1" value = "bbbbb" />
+        <property name="stringList">
+            <list>
+                <value>aaaa</value>
+                <value>bbbb</value>
+                <value>ccccc</value>
+            </list>
+        </property>
+        <property name="anotherBeanList">
+            <list>
+                <ref bean="anotherBean"/>
+                <ref bean="anotherBean"/>
+                <ref bean="anotherBean"/>
+            </list>
+        </property>
+        <property name="stringMap">
+            <map>
+                <entry key="ccccc" value="ddddd" />
+                <entry key="eeee" value="fffff" />
+            </map>
+        </property>
+        <property name="anotherBeanMap">
+            <map>
+                <entry key-ref="anotherBean" value-ref="anotherBean"/>
+            </map>
+        </property>
+
+    </bean>
+
+
+</beans>
