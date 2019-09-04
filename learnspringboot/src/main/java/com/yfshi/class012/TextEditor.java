@@ -18,17 +18,15 @@ public class TextEditor {
         System.out.println("Inside TextEditor constructor(list).");
         this.keywords = list;
     }
-    public TextEditor(SpellChecker spellChecker) {
-        System.out.println("Inside TextEditor constructor(checker).");
-        this.testspellChecker = spellChecker;
-    }
-    public TextEditor(SpellChecker spellChecker, String generateType) {
-        System.out.println("Inside TextEditor constructor.");
-        this.testspellChecker = spellChecker;
+
+    public TextEditor(String text,String generateType) {
+        System.out.println("Inside TextEditor constructor(text,generateType).");
+        this.text = text;
         this.generateType = generateType;
     }
-    public TextEditor(SpellChecker spellChecker, String generateType, String text) {
-        System.out.println("Inside TextEditor constructor(checker, generteType, text).");
+
+    public TextEditor(  String text,String generateType,SpellChecker spellChecker) {
+        System.out.println("Inside TextEditor constructor(text, generateType, spellChecker).");
         this.testspellChecker = spellChecker;
         this.generateType = generateType;
         this.text = text;
@@ -58,17 +56,6 @@ public class TextEditor {
         System.out.println("set TextEditor spellChecker : " + testspellChecker);
         this.testspellChecker = testspellChecker;
     }
-    public void setaverygooda(SpellChecker testspellChecker) {
-        System.out.println("wocaozhehaizhenshicuode1");
-    }
-    public void setaverygooda2(SpellChecker testspellChecker) {
-        System.out.println("wocaozhehaizhenshicuode2");
-    }
-    public void setaverygooda3(SpellChecker testspellChecker) {
-        System.out.println("wocaozhehaizhenshicuode3");
-    }
-
-
 
     @SuppressWarnings("rawtypes")
     public List getKeyWords() {

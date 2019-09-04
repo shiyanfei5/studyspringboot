@@ -15,11 +15,11 @@ public class TextEditorTest {
     public void test(){
         AbstractApplicationContext context = new ClassPathXmlApplicationContext("spring_autowire.xml");
 
-        TextEditor textEditor = context.getBean("textEditor", TextEditor.class);
-        System.out.println("textEditor->generateType: " + textEditor.getGenerateType());
-        System.out.println("textEditor->checkText: " + textEditor.getText());
+//        TextEditor textEditor = context.getBean("textEditor", TextEditor.class);
+//        System.out.println("textEditor->generateType: " + textEditor.getGenerateType());
+//        System.out.println("textEditor->checkText: " + textEditor.getText());
 //        System.out.println("textEditor->spellCheck: " + textEditor.spellCheck());
-        System.out.println("");
+//        System.out.println("");
 
 //        TextEditor textEditor2 = context.getBean("textEditor2", TextEditor.class);
 //        System.out.println("textEditor2->generateType: " + textEditor2.getGenerateType());

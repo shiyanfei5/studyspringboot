@@ -17,7 +17,7 @@
    <!--   &lt;!&ndash; autowire constructor &ndash;&gt;-->
       <bean id="textEditor3" class="com.yfshi.class012.TextEditor" autowire="constructor">
          <constructor-arg index="1" value = "autoWire = constructor" />
-         <constructor-arg value = "Text, Wood, SuperMen, byType" />
+         <constructor-arg value = "Text, Wood, SuperMen, constructor" />
           <property name="text" value="Text, Wood, SuperMen" />
           <property name="generateType" value="autoWire = byType" />
       </bean>
