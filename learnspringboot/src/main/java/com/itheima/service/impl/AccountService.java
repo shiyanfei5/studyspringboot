@@ -7,8 +7,12 @@ import com.itheima.service.IAccountService;
 public class AccountService implements IAccountService {
 
 
-    private IAccountDao accountDao = Beanfactory.
-            getBean("accountDao",IAccountDao.class); //依赖对象
+    private IAccountDao accountDao ;
+
+
+    public AccountService(){
+        System.out.println("对象创建了");
+    }
 
     @Override
     public void saveAccount() {

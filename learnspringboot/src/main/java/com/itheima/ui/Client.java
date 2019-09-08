@@ -12,14 +12,9 @@ public class Client {
 
 
     public static void main(String[] args){
-
-
-
-        IAccountService accountService =
-                (AccountService)Beanfactory.getBean("accountService");
-        accountService.saveAccount();
-
-
+        ApplicationContext context =
+                new ClassPathXmlApplicationContext("bean.xml");
+        IAccountService service = context.getBean("accountService", IAccountService.class );
 
 
 

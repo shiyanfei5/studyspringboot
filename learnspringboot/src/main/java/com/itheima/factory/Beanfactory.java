@@ -43,7 +43,7 @@ public class Beanfactory {
         }
     }
 
-    
+
     public static Object getBean(String beanName) {
         return beansMap.get(beanName);
     }
