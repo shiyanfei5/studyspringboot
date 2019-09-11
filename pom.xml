@@ -13,6 +13,7 @@
         <module>learmjpa</module>
         <module>learnspringjpa</module>
         <module>learnspringboot</module>
+        <module>learnjdbc</module>
     </modules>
 
     <!--   继承父包    -->

@@ -23,7 +23,7 @@ public class factory {
 
     }
 
-    public static Object getBean(String beanName){
+    public static void getBean(String beanName){
         try{
 
             //1.读取配置文件，跟beanName获得全类名,如何读？
