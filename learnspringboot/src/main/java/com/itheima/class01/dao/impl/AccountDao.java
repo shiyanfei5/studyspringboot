@@ -1,6 +1,6 @@
-package com.itheima.dao.impl;
+package com.itheima.class01.dao.impl;
 
-import com.itheima.dao.IAccountDao;
+import com.itheima.class01.dao.IAccountDao;
 
 public class AccountDao implements IAccountDao {
 

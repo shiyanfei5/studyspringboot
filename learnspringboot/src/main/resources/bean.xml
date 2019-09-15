@@ -6,7 +6,7 @@
 
 
 
-    <bean id="accountService" class = "com.itheima.service.impl.AccountService" />
-    <bean id="accountDao" class = "com.itheima.dao.impl.AccountDao" />
+    <bean id="accountService" class = "com.itheima.class01.service.impl.AccountService" />
+    <bean id="accountDao" class = "com.itheima.class01.dao.impl.AccountDao" />
 
 </beans>

@@ -1,4 +1,4 @@
-package com.itheima.dao;
+package com.itheima.class01.dao;
 
 public interface IAccountDao {
 

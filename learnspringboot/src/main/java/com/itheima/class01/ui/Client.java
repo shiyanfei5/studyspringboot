@@ -1,10 +1,6 @@
-package com.itheima.ui;
+package com.itheima.class01.ui;
 
-import com.itheima.dao.IAccountDao;
-import com.itheima.dao.impl.AccountDao;
-import com.itheima.factory.Beanfactory;
-import com.itheima.service.IAccountService;
-import com.itheima.service.impl.AccountService;
+import com.itheima.class01.service.IAccountService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

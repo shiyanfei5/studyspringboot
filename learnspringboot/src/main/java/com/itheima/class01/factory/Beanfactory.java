@@ -1,7 +1,6 @@
-package com.itheima.factory;
+package com.itheima.class01.factory;
 
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
