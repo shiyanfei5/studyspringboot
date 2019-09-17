@@ -21,6 +21,18 @@ public class AccountServiceImplTest {
 //    ApplicationContext context = new ClassPathXmlApplicationContext("itheima_class02.xml");
 
     ApplicationContext context = new AnnotationConfigApplicationContext(MyConfigration.class);
+
+    @Test
+    public void testconfig(){
+        String[] names = context.getBeanDefinitionNames();
+        MyConfigration myConfigration = context.getBean("myConfigration",MyConfigration.class);
+
+        for(String item : names){
+            System.out.println(item);
+        }
+
+    }
+
     @Test
     public void testFindAll(){
         IAccountService accountService =
