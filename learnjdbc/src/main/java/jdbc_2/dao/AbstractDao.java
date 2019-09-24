@@ -2,10 +2,12 @@ package jdbc_2.dao;
 
 
 import jdbc_2.JdbcUtils;
+import jdbc_2.exception.DaoException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * 抽象SQL的执行，封装SQL，传入SQL即可执行
@@ -24,16 +26,13 @@ public abstract class AbstractDao {
             ps = connection.prepareStatement(sql);
             JdbcUtils.setPrepareStatementArgs(ps,args);
             return ps.executeUpdate();
-        } catch (Exception e){
-            e.printStackTrace();
+        } catch (SQLException e){
+            throw  new DaoException(e.getMessage(),e);  //将编译异常转换为运行时异常
         } finally {
             JdbcUtils.close(rs,ps,connection);
         }
 
     }
-
-
-
 
 
 }
