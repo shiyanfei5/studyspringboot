@@ -1,11 +1,11 @@
-package jdbc_2.dao.impl;
+package jdbc_datasource.dao.impl;
 
 
-import jdbc_2.dao.BaseDao;
-import jdbc_2.dao.IRowMapper;
-import jdbc_2.dao.IUserDao;
-import jdbc_2.entity.User;
-import jdbc_2.exception.DaoException;
+import jdbc_datasource.dao.BaseDao;
+import jdbc_datasource.dao.IRowMapper;
+import jdbc_datasource.dao.IUserDao;
+import jdbc_datasource.entity.User;
+import jdbc_datasource.exception.DaoException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

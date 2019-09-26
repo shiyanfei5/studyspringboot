@@ -16,13 +16,13 @@ public class UserDaoImplTest {
 
     @Test
     public void testcrud(){
-        User user = new User("shiyanfei2",38, new Date(1980-1900,01,30));
-        user.setId(2);
-        IUserDao userDao = new UserDaoImpl();
-//        userDao.addUser(user);
-//        userDao.delete(1);
-        userDao.update(user);
+        User user = new User("rju",29, new Date(1990-1900,01,30));
 
+        IUserDao userDao = new UserDaoImpl();
+
+        userDao.addUser(user);
+        System.out.println(userDao.findUserByName("rju"));
+        System.out.println(userDao.getUser(4));
 
 
 

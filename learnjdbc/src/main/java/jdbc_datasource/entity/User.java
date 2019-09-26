@@ -1,4 +1,4 @@
-package jdbc_2.entity;
+package jdbc_datasource.entity;
 
 
 import java.util.Date;
