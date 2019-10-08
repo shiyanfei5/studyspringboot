@@ -27,7 +27,6 @@ public class JdbcUtils {
             //直接在此处统一注册驱动，这样不用每次在调用时进行注册
             Class.forName(props.getProperty("jdbc.driver"));
 
-
         } catch (Exception e){
             e.printStackTrace();
         }

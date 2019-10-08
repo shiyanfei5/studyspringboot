@@ -2,6 +2,7 @@ package jdbc_datasource.dao;
 
 
 import jdbc_datasource.JdbcUtils;
+import jdbc_datasource.datasource.MyDataSource;
 import jdbc_datasource.exception.DaoException;
 
 import java.sql.Connection;
@@ -20,12 +21,14 @@ public  class BaseDao {
     /**
      * 执行增删改，通过ps.executeUpdate方法
      */
+
+
     public int executeUpdate(String sql, Object ... args){
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         try{
-            connection = JdbcUtils.getConnection();
+            connection = MyDataSource.getConnection();
             ps = connection.prepareStatement(sql);
             JdbcUtils.setPrepareStatementArgs(ps,args);
             return ps.executeUpdate();
@@ -42,7 +45,7 @@ public  class BaseDao {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try{
-            connection = JdbcUtils.getConnection();
+            connection = MyDataSource.getConnection();
             ps = connection.prepareStatement(sql);
             JdbcUtils.setPrepareStatementArgs(ps,args);
             rs = ps.executeQuery(); //用于接收结果
