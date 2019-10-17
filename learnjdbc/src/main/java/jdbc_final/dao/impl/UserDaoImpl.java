@@ -13,7 +13,7 @@ import java.util.List;
 
 public class UserDaoImpl implements IUserDao {
 
-    BaseDao baseDao = new BaseDao();
+    private BaseDao baseDao = new BaseDao();
 
     @Override
     public int addUser(User user) {
