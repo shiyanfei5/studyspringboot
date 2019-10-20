@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/learmjpa/learmjpa.iml" filepath="$PROJECT_DIR$/learmjpa/learmjpa.iml" />
-      <module fileurl="file://$PROJECT_DIR$/learn_reflect/learn_reflect.iml" filepath="$PROJECT_DIR$/learn_reflect/learn_reflect.iml" />
     </modules>
   </component>
 </project>

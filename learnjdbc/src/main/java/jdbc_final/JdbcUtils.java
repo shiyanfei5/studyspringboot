@@ -30,7 +30,6 @@ public class JdbcUtils {
     }
 
     public static void close(ResultSet rs,PreparedStatement ps, Connection c){
-
         //必须这么写，保证一个抛出来异常后后面的继续执行
         try{
             if(rs != null) rs.close();

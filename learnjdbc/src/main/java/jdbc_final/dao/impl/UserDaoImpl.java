@@ -2,7 +2,7 @@ package jdbc_final.dao.impl;
 
 
 import jdbc_final.dao.BaseDao;
-import jdbc_final.dao.IRowMapper;
+import aop.dao.IRowMapper;
 import jdbc_final.dao.IUserDao;
 import jdbc_final.entity.User;
 import jdbc_final.exception.DaoException;

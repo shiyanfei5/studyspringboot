@@ -1,8 +1,7 @@
-package jdbc_final.dao;
+package aop.dao;
 
 
-import aop.dao.IRowMapper;
-import jdbc_final.JdbcUtils;
+import aop.JdbcThreadUtil;
 import jdbc_final.exception.DaoException;
 
 import java.sql.Connection;
@@ -21,21 +20,21 @@ public  class BaseDao {
     /**
      * 执行增删改，通过ps.executeUpdate方法
      */
-
+    private JdbcThreadUtil jdbc = new JdbcThreadUtil();
 
     public int executeUpdate(String sql, Object ... args){
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         try{
-            connection = JdbcUtils.getConnection();
+            connection = jdbc.getConnection();
             ps = connection.prepareStatement(sql);
-            JdbcUtils.setPrepareStatementArgs(ps,args);
+            JdbcThreadUtil.setPrepareStatementArgs(ps,args);
             return ps.executeUpdate();
         } catch (SQLException e){
             throw  new DaoException(e.getMessage(),e);  //将编译异常转换为运行时异常
         } finally {
-            JdbcUtils.close(rs,ps,connection);
+            JdbcThreadUtil.close(rs,ps);
         }
     }
 
@@ -45,13 +44,12 @@ public  class BaseDao {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try{
-            connection = JdbcUtils.getConnection();
+            connection = jdbc.getConnection();
             ps = connection.prepareStatement(sql);
-            JdbcUtils.setPrepareStatementArgs(ps,args);
+            JdbcThreadUtil.setPrepareStatementArgs(ps,args);
             rs = ps.executeQuery(); //用于接收结果
 
             List<T> res = new ArrayList<>(); //结果集
-
             while(rs.next()){
                T item =  clazz.cast( rowMapper.mapRow(rs) );    //类型转换
                res.add(item);
@@ -60,7 +58,7 @@ public  class BaseDao {
         } catch (SQLException e){
             throw  new DaoException(e.getMessage(),e);  //将编译异常转换为运行时异常
         } finally {
-            JdbcUtils.close(rs,ps,connection);
+            JdbcThreadUtil.close(rs,ps);
         }
 
     }

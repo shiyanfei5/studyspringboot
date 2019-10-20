@@ -11,6 +11,7 @@
         <module name="learnspringjpa" />
         <module name="learnjdbc" />
         <module name="learnspringboot" />
+        <module name="learn_reflect" />
       </profile>
     </annotationProcessing>
   </component>
