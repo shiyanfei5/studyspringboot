@@ -23,7 +23,7 @@ public class UserServiceImpl implements IUserService {
         userDao.add(user);
         userList = userDao.findUserByName("yfshi");
         System.out.println("--查询结果:"+userList);
-        throw new DaoException("aaaa");
+        throw  new DaoException("aaaa");
 
     }
 }
