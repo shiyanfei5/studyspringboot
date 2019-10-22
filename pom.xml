@@ -14,6 +14,7 @@
         <module>learnspringjpa</module>
         <module>learnspringboot</module>
         <module>learnjdbc</module>
+        <module>learnhttpserver</module>
     </modules>
 
     <!--   继承父包    -->
