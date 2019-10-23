@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bookstore>
-    <book id="1">
+<bookstore xmlns:="http://www.mytest.com">
+    <book id="1s">
         <name>冰与火之歌</name>
         <author>乔治马丁</author>
         <year>2014</year>
         <price>89</price>
     </book>
-    <book id="2">
+    <book id="te">
         <name>安徒生童话</name>
         <year>2004</year>
         <price>77</price>
         <language>English</language>
     </book>
+
+    <sample xmlns:ins="http://www.lsmx.net.ac">
+        <ins:batch-list>
+            <ins:batch>Evening Batch</ins:batch>
+        </ins:batch-list>
+    </sample>
 </bookstore>
