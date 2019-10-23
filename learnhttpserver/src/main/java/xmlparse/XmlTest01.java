@@ -21,6 +21,7 @@ public class XmlTest01 {
             //
             //编写Document注册处理器
             XmlProcessHandler pHandler = new XmlProcessHandler();
+
             parser.parse(
                     Thread.currentThread().getContextClassLoader()
                     .getResourceAsStream("test.xml"),
