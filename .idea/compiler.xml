@@ -7,11 +7,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="studyspringbatcn" />
-        <module name="learnspringjpa" />
         <module name="learnjdbc" />
-        <module name="learnspringboot" />
+        <module name="learnspringjpa" />
+        <module name="learnhttpserver" />
+        <module name="studyspringbatcn" />
         <module name="learn_reflect" />
+        <module name="learnspringboot" />
       </profile>
     </annotationProcessing>
   </component>
