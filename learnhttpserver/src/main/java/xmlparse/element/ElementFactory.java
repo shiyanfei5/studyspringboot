@@ -1,7 +1,5 @@
-package xmlparse;
+package xmlparse.element;
 
-import xmlparse.element.Book;
-import xmlparse.element.ITag;
 
 //单例
 public class ElementFactory {
@@ -14,11 +12,10 @@ public class ElementFactory {
         return factory;
     }
 
-    public ITag createTag(String tagName){
-        if("book".equals("book")){
-            return new Book();
-        }
-        return null;
+    public Tag createTag(String tagName){
+        Tag res = new Tag();
+        res.setName(tagName);
+        return res;
     }
 
 
