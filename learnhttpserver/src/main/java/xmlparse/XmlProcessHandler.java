@@ -3,28 +3,26 @@ package xmlparse;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+import xmlparse.element.ElementFactory;
 import xmlparse.element.ITag;
 import xmlparse.element.Tag;
 
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class XmlProcessHandler extends DefaultHandler {
 
-    private ElementFactory elementFactory;
-    private ITag currentTag; //当前Tag
-    private Map<String, List<ITag>> tagMap;
-    private List<ITag> tagStack; //只要addDepth为true，表示没有闭合，层数增加
+    private ElementFactory elementFactory = ElementFactory.getFactory();
+    private Map<String , Tag> tagMap;
+    private List<Tag> contextTagStack;
 
-    XmlProcessHandler(){
-        tagMap = new HashMap<String, List<ITag>>();
-        elementFactory =  ElementFactory.getFactory();
-        tagStack = new ArrayList<ITag>();
-    }
 
     @Override
     public void startDocument() throws SAXException {
-        System.out.println("开始进入读取XML");
+        tagMap = new HashMap<String, Tag>();
+        contextTagStack = new ArrayList<Tag>();
     }
 
     @Override
@@ -38,14 +36,14 @@ public class XmlProcessHandler extends DefaultHandler {
      */
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-
-        currentTag  = elementFactory.createTag(qName);
-        if(tagStack.size()>0){
-            //存在爸爸并设置关联关系
-            tagStack.get(tagStack.size()-1).setSon(currentTag);
+        //进入新的元素，通过栈来记录层次结构，每次新元素先和父类建立关系
+        Tag currentTag = elementFactory.createTag(qName);
+        tagMap.put(qName,currentTag);   //加入结果集
+        Tag parentTag = getLastTag();
+        if( parentTag != null){
+            parentTag.addSon(currentTag);
         }
-        tagStack.add(currentTag);
-        tagMapPut(qName,currentTag);
+        contextTagStack.add( currentTag); //入栈
     }
 
     /**
@@ -54,50 +52,48 @@ public class XmlProcessHandler extends DefaultHandler {
      */
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        //元素结尾进行出栈，通过栈表示深度
-        tagStack.remove(tagStack.size()-1);
+        //栈出
+        popContextStack();
     }
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-        String value = this.valueProcess(ch,start,length);
-        if(value != null ){
-            currentTag.setValue(value);
+        String res = tagValueProcess(ch,start,length);
+        if(res != null){    //存在结果，给当前tag设置值
+            getLastTag().setValue(res);
         }
 
     }
 
-    /**
-     * 结果拷贝+字符串处理..剔除空值
-     * @param ch
-     * @param start
-     * @param length
-     * @return
-     */
-    private String valueProcess(char[] ch, int start, int length){
-        if(length<1){
-            return  null;
-        }
-        char[] chArr = new char[length];
-        System.arraycopy(ch,start,chArr,0,length);
-        String str = String.valueOf(chArr).trim() ;
-        return str.length()>0?str:null;
 
+    static private String tagValueProcess(char[] ch, int start,  int len){
+        if(len < 1){
+            return null;
+        }
+        char[] chArr = new char[len];
+        System.arraycopy(ch,start,chArr,0,len);
+        String value = String.valueOf(chArr).trim();
+        if(value.length() > 0){
+            return value;
+        }
+        return null;
     }
 
-    private void tagMapPut(String key,ITag tag){
-        List<ITag> tagList = tagMap.get(key);
-        if(tagList == null){
-            List<ITag> l = new ArrayList<ITag>();
-            l.add(tag);
-            tagMap.put(key, l);
+    private Tag  getLastTag(){
+        if(contextTagStack.size() > 0 ){
+            return contextTagStack.get( contextTagStack.size()-1);
         } else{
-            tagList.add(tag);
+            return null;
         }
     }
 
-    public void getResultMap(){
-        System.out.println(tagMap);
+    private void  popContextStack(){
+        int last = contextTagStack.size();
+        if( last > 0 ){
+            contextTagStack.remove( last -1);
+        }
     }
-
+    public Map<String , Tag> getTagMap(){
+        return this.tagMap;
+    }
 }

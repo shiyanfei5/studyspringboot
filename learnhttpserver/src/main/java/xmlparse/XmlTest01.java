@@ -28,7 +28,7 @@ public class XmlTest01 {
                     pHandler
             );
 
-            pHandler.t();
+            pHandler.getTagMap();
 
 
 
