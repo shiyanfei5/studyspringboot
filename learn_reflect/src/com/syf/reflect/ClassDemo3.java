@@ -1,9 +1,7 @@
 package com.syf.reflect;
 
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class ClassDemo3 {
 
@@ -26,6 +24,9 @@ public class ClassDemo3 {
 
     public static void main(String[] arg){
         test( ()->System.out.println("重写的函数式接口"));
+        Map<String,String> map = new LinkedHashMap<>();
+        map.put(null,"test");
+        System.out.println(map.get(null));
 
     }
 }

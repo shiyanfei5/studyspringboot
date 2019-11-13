@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class HelloJDBC {
 
@@ -79,7 +82,21 @@ public class HelloJDBC {
     }
 
     public static  void main(String[] args){
-        connect2();
+        List<String > test = new ArrayList<>();
+        test.add("mytest");
+        test.add("mytest2");
+        test.add("mytest3");
+        test.add("mytest4");
+        List<String> test2 = test.stream().filter( p -> p.contains("mytest")).collect(Collectors.toList());
+        List<String> test3 = test.stream().filter( p -> p.contains("11mytest")).collect(Collectors.toList());
+        System.out.println(test2);
+        System.out.println(test3);
+
+
+
+
+
+
     }
 
 
