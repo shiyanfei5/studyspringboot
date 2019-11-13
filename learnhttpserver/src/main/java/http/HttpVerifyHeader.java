@@ -26,27 +26,27 @@ public class HttpVerifyHeader {
      *
      * @param arr
      * @param start
-     * @return 若匹配成功返回 验证成功的字符串位置，否则返回验证了字符串的长度
+     * @return 若匹配到的字符串位置
      */
-    public Integer verify(char[] arr, int start){
+    public Integer verify(char[] arr, int start,int len){
         int i ;
-        for(i = start; i<arr.length;i++ ){
-            char temp = arr[i];
+        for(i = 0; i<len;i++ ){
+            char temp = arr[start+i];
             if( temp == verifyStack.peek()){
                 successStack.push( verifyStack.pop() );  //相等则出栈
                 verifyState = true ; //激活状态
             }else{
-                if(verifyState) { //说明被激活且匹配失败
+                if(verifyState) { //说明被之前存在匹配但本次匹配失败
                     resetStack();   //栈重置
                     verifyState = false;    //重置匹配状态
                 }
             }
             if(getResult()){
-                break;  //成功匹配
+                return start+i;  //匹配成功的位置
             }
 
         }
-        return i;   //返回验证的
+        return start+i-1;   //返回验证的最后一个字符串位置
 
     }
 
@@ -54,7 +54,10 @@ public class HttpVerifyHeader {
      * 验证失败，恢复验证的初始状态
      */
     private void resetStack(){
-        for(int i = 0 ; i <  successStack.size(); i++){
+        //必须这么写，因为 Stack进行下面操作的size时变化的
+        int size = successStack.size();
+
+        for(int i = 0 ; i <  size; i++){
             verifyStack.push( successStack.pop());
         }
     }
