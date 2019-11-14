@@ -1,72 +1,93 @@
 package http;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class ReqHeaderHandler {
+
     /**
-     * 存在状态
+     * 状态机
      */
-    private boolean isFinish = false;   //对象的状态机
+    private Request request;    //绑定处理的请求
+    private boolean isFinish = false;   //对象的状态机，若其完成则委托后续请求体处理
     private ReqBodyHandler nextHandler;
-    private StringBuilder content = new StringBuilder();
-    private HttpVerifyHeader verifyHeader = new HttpVerifyHeader("\n\r\n\r");
-    private Map<String,String> headerMap = new HashMap<String, String>();
+    private HttpVerityEnd verifyHeader = new HttpVerityEnd("\n\r\n\r");
+
+    public void setFinish(boolean finish) {
+        isFinish = finish;
+    }
 
     public void setNextHandler(ReqBodyHandler nextHandler) {
         this.nextHandler = nextHandler;
     }
+    public void setRequest(Request request) {
+        this.request = request;
+    }
 
+    public Boolean process(char[] contentArr, int start,int len,StringBuilder content){
 
-    public void process(char[] contentArr, int start,int len){
-        //本次校验的字符位置
-        int checkPos = verifyHeader.verify(contentArr,start,len);
-        //完成校验，责任链直接传给ReqBodyHandler处理
+        //若请求头完成校验，责任链直接传给ReqBodyHandler处理
         if(isFinish){
-            nextHandler.process(contentArr,start,len);
+            return nextHandler.process(contentArr,start,len,content);
         } else {
+            //若未完成，首先进行校验
+            int checkPos = verifyHeader.verify(contentArr,start,len);
             //说明结尾再该字符数组中
             if (verifyHeader.getResult()) {
                 content.append(contentArr, start, checkPos+1);
-                isFinish = true;
-                this.formatHeaderMap();
+                setFinish(true);    //表明已完成校验
+                this.contentTransformHeaderMap(content);  //将content字符串转为map
+
+                //判断请求类型
+                String type = request.getReqHeader().get("method");
+                if("GET".equals(type)){
+                    //若为GET请求，仅仅有请求头
+                    return true;
+                }
+
+                //是否包含请求体长度
+                Integer length = Integer.parseInt(
+                        request.getReqHeader().get("Content-Length")
+                );
+                nextHandler.setLength(length); //length有值或未null
+
                 // 当checkPos 小于最后一个字节，说明一部分字节时请求体的，首先对其检查
                 if (checkPos < len-1) {
-                    char[] bodyArr = new char[len - checkPos -1 ];
-                    System.arraycopy(contentArr, checkPos+1, bodyArr, 0, len - checkPos -1);
-                    nextHandler.process(bodyArr, 0, len - checkPos -1);
+                    return nextHandler.process
+                            (contentArr, checkPos+1, len - checkPos -1,content);
                 }
 
             } else {
                 content.append(contentArr, start, checkPos+1); //加入内容
             }
         }
+        return false;
     }
 
 
-    private void formatHeaderMap() {
-        String a = content.toString();
+    private void contentTransformHeaderMap(StringBuilder content) {
         String[] stringList =  content.toString().split("\r\n");
-        for(String line :stringList){
-            if(line.contains("POST") || line.contains("GET")){
+        if(request.getReqHeader() == null){
+            request.setReqHeader( new HashMap<String, String>());
+        }
+        for(String line :stringList) {
+            if (line.contains("POST") || line.contains("GET")) {
                 String[] i = line.split(" ");
-                headerMap.put("method",i[0].trim());
-                headerMap.put("url",i[1].trim());
+                request.getReqHeader().put("method", i[0].trim());
+                request.getReqHeader().put("url", i[1].trim());
                 continue;
             }
-            if(line.equals("") ){   //自动去除换行符
+            if (line.equals("")) {   //自动去除换行符
                 break;
-            }else{
+            } else {
                 String[] i = line.split(":");
                 String value = i[1].trim();
-                if(value == null || value.length() < 1){
+                if (value == null || value.length() < 1) {
                     value = null;
                 }
-                headerMap.put(i[0].trim(),value);
+                request.getReqHeader().put(i[0].trim(), value);
             }
-
-
+        }
+        content.delete(0,content.length());     //形成后清空
     }
 
 
@@ -79,4 +100,4 @@ public class ReqHeaderHandler {
 
 
 
-}
+

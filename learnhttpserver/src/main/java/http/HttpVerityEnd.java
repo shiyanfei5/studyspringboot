@@ -2,18 +2,18 @@ package http;
 
 import java.util.Stack;
 
-public class HttpVerifyHeader {
+public class HttpVerityEnd {
 
     private Stack<Character> verifyStack;
     private boolean verifyState; //是否激活
     private Stack<Character> successStack;  //成功匹配的
 
 
-    public HttpVerifyHeader(String regString){
+    public HttpVerityEnd(String regString){
         this(regString.toCharArray());
     }
 
-    public HttpVerifyHeader(char[] regCharArr){
+    public HttpVerityEnd(char[] regCharArr){
         successStack = new Stack<Character>(); //储存成功字符串
         verifyStack = new Stack<Character>();
         for(char c:regCharArr){
@@ -35,15 +35,17 @@ public class HttpVerifyHeader {
             if( temp == verifyStack.peek()){
                 successStack.push( verifyStack.pop() );  //相等则出栈
                 verifyState = true ; //激活状态
+                if(getResult()){        //当验证成功看看是否匹配成功
+                    return start+i;  //匹配成功的位置
+                }
+
             }else{
                 if(verifyState) { //说明被之前存在匹配但本次匹配失败
                     resetStack();   //栈重置
                     verifyState = false;    //重置匹配状态
                 }
             }
-            if(getResult()){
-                return start+i;  //匹配成功的位置
-            }
+
 
         }
         return start+i-1;   //返回验证的最后一个字符串位置

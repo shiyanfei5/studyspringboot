@@ -3,34 +3,39 @@ package http;
 public class ReqBodyHandler {
 
 
-    private boolean isLength = false;   //默认为不定长度
-    private StringBuilder content = new StringBuilder();
-    private HttpVerifyHeader verifyHeader = new HttpVerifyHeader("\n\r0\n\r");
+    private Integer length;   //默认为不定长度
+    private HttpVerityEnd verifyHeader = new HttpVerityEnd("\n\r0\n\r");
+    private Request request;
 
-    public StringBuilder getContent() {
-        return content;
+
+    public Integer getLength() {
+        return length;
     }
 
-    public boolean isLength() {
-        return isLength;
+    public void setLength(Integer length) {
+        this.length = length;
     }
 
-    public void setLength(boolean length) {
-        isLength = length;
-    }
-
-    public void process(char[] contentArr, int start,int len) {
-        if(isLength){
-            content.append(contentArr,start,len);
+    public Boolean process(char[] contentArr, int start, int len, StringBuilder content) {
+        if(length == null){
+            //未指定长度验证
+            //获取本次check的位置
+            int checkPos = verifyHeader.verify(contentArr,start,len);
+            //加入
+            if(verifyHeader.getResult()){
+                return true;    //处理完成
+            }
+            content.append(contentArr,start,checkPos+1);
+            return false ;      //未处理完成
         }
         else{
-            //未指定长度
-            //获取本次校验字符数量
-            int checkSize = verifyHeader.verify(contentArr,start,len);
-            if (verifyHeader.getResult()) {
-                content.append(contentArr, start, checkSize);   //加入结尾内容
+            //指定长度
+            content.append(contentArr, start, len);
+            length = length - len;
+            if (length>0) {
+                return false;
             } else {
-                content.append(contentArr, start, checkSize); //加入内容
+                return true; //处理完成
             }
         }
     }

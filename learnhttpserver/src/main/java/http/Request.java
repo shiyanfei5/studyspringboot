@@ -10,6 +10,15 @@ import java.util.Map;
 
 public class Request {
 
+    private Map<String,String> reqHeader;
+
+    public Map<String, String> getReqHeader() {
+        return reqHeader;
+    }
+
+    public void setReqHeader(Map<String, String> reqHeader) {
+        this.reqHeader = reqHeader;
+    }
 
     public Request(InputStream in ){
         BufferedReader bufferedReader = null;
@@ -22,19 +31,23 @@ public class Request {
         char[] buffer = new char[100];
         int len;
         ReqHeaderHandler hadler = new ReqHeaderHandler();
+        hadler.setRequest(this);
         ReqBodyHandler bodyHandler = new ReqBodyHandler();
         hadler.setNextHandler(bodyHandler);
+        Boolean is = false;
+        StringBuilder content = new StringBuilder();    //字符累计器，用于累计
 
+        while(!is){
 
-        while(true){
             try{
                 len = bufferedReader.read(buffer);
-                hadler.process(buffer,0,len);    //每次处理一个buffer大小的内容
+                is = hadler.process(buffer,0,len,content);    //每次处理一个buffer大小的内容
             } catch (IOException e){
                 e.printStackTrace();
             }
 
         }
+        System.out.println("xx");
 
     }
 
