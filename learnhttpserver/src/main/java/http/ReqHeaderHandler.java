@@ -35,7 +35,7 @@ public class ReqHeaderHandler {
             if (verifyHeader.getResult()) {
                 content.append(contentArr, start, checkPos+1);
                 setFinish(true);    //表明已完成校验
-                this.contentTransformHeaderMap(content);  //将content字符串转为map
+                request.contentTransformHeaderMap(content);  //将content字符串转为map
 
                 //判断请求类型
                 String type = request.getReqHeader().get("method");
@@ -64,31 +64,7 @@ public class ReqHeaderHandler {
     }
 
 
-    private void contentTransformHeaderMap(StringBuilder content) {
-        String[] stringList =  content.toString().split("\r\n");
-        if(request.getReqHeader() == null){
-            request.setReqHeader( new HashMap<String, String>());
-        }
-        for(String line :stringList) {
-            if (line.contains("POST") || line.contains("GET")) {
-                String[] i = line.split(" ");
-                request.getReqHeader().put("method", i[0].trim());
-                request.getReqHeader().put("url", i[1].trim());
-                continue;
-            }
-            if (line.equals("")) {   //自动去除换行符
-                break;
-            } else {
-                String[] i = line.split(":");
-                String value = i[1].trim();
-                if (value == null || value.length() < 1) {
-                    value = null;
-                }
-                request.getReqHeader().put(i[0].trim(), value);
-            }
-        }
-        content.delete(0,content.length());     //形成后清空
-    }
+
 
 
 }

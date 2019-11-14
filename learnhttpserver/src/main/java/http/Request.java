@@ -6,6 +6,7 @@ import myhttp.HttpRequest;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Request {
@@ -15,11 +16,7 @@ public class Request {
     public Map<String, String> getReqHeader() {
         return reqHeader;
     }
-
-    public void setReqHeader(Map<String, String> reqHeader) {
-        this.reqHeader = reqHeader;
-    }
-
+    
     public Request(InputStream in ){
         BufferedReader bufferedReader = null;
         try{
@@ -51,6 +48,32 @@ public class Request {
 
     }
 
+
+    public void contentTransformHeaderMap(StringBuilder content) {
+        String[] stringList =  content.toString().split("\r\n");
+        if(reqHeader == null){
+            reqHeader =  new HashMap<String, String>();
+        }
+        for(String line :stringList) {
+            if (line.contains("POST") || line.contains("GET")) {
+                String[] i = line.split(" ");
+                reqHeader.put("method", i[0].trim());
+                reqHeader.put("url", i[1].trim());
+                continue;
+            }
+            if (line.equals("")) {   //自动去除换行符
+                break;
+            } else {
+                String[] i = line.split(":");
+                String value = i[1].trim();
+                if (value == null || value.length() < 1) {
+                    value = null;
+                }
+                reqHeader.put(i[0].trim(), value);
+            }
+        }
+        content.delete(0,content.length());     //形成后清空
+    }
 
 
     public static void main(String[] args) throws Exception{
