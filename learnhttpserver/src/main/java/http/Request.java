@@ -74,6 +74,7 @@ public class Request {
         ReqBodyHandler bodyHandler = new ReqBodyHandler(this);
         reqhandler.setNextHandler(bodyHandler);
         ByteAccumulation content = new ByteAccumulation();   //content累加
+        in.read()
 
         while(reqState != State.FINISH ){
             //进行请求头处理

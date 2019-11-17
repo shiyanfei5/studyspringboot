@@ -23,9 +23,10 @@ public class ReqBodyHandler {
     public Int processBySingleChunk(byte[] contentArr, int start, int len, ByteAccumulation content) {
 
         //chunk模式下，首先判断是否已经提取出该chunk的大小，则通过httpverify验证\r\
+        Integer checkPos ;
         if(request.getChunkSize() == null){
             //未提取出chunk大小
-            int checkPos = verifyBody.verify(contentArr,start,len);
+            checkPos = verifyBody.verify(contentArr,start,len);
             if(verifyBody.getResult()){
                 //若成功验证到了结尾，去除结尾结束符
                 content.append(contentArr,start,checkPos+1-start);
@@ -34,6 +35,10 @@ public class ReqBodyHandler {
                 );
                 //清空
                 content.clear();
+                if(checkPos < start+len -1){
+
+                }
+
 
             } else{
                 //当未校验到结尾时，全部加入content中 用以下次验证
