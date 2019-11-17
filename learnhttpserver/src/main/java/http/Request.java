@@ -79,9 +79,8 @@ public class Request {
             //进行请求头处理
             if(reqState == State.HEADER){
                 len = in.read(buffer);
-                waitProcessStartPos = 0;    //头部报文永远从头按顺序开始
                 Integer processPos =
-                        reqhandler.process(buffer,waitProcessStartPos,len,content);    //每次处理一个buffer大小的内容
+                        reqhandler.process(buffer,0,len,content);    //每次处理一个buffer大小的内容
                 //当请求头校验结束后，若该buffer即包含请求头，又包含请求体
                 if(reqState == State.BODY && processPos < len - 1 ){
                     waitProcessStartPos = processPos+1 ;
@@ -106,6 +105,7 @@ public class Request {
                 } else {
                     // 按照content-length进行处理
                     bodyHandler.processByContentLength(buffer,waitProcessStartPos,len,content);
+                    waitProcessStartPos = null; //表示没有待处理的了
                 }
 
 

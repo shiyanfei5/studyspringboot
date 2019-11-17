@@ -49,7 +49,7 @@ public class ReqHeaderHandler {
                     null:Integer.parseInt(
                     request.getReqHeader().get("Content-Length")
             );
-            request.setContentLength(length); //length有值或未null
+            request.setByteLength(length); //length有值或未null
             request.setChunck(
                     "chunked".equals( request.getReqHeader().get("Transfer-Encoding") )
             );

@@ -25,4 +25,7 @@ public class ByteAccumulation {
         content = new byte[0];
     }
 
+    public Integer length(){
+        return content.length;
+    }
 }

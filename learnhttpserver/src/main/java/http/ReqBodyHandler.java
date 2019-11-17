@@ -28,23 +28,21 @@ public class ReqBodyHandler {
             int checkPos = verifyBody.verify(contentArr,start,len);
             if(verifyBody.getResult()){
                 //若成功验证到了结尾，去除结尾结束符
+                content.append(contentArr,start,checkPos+1-start);
                 request.setChunkSize(
-                         extractChunkSize(contentArr,start,checkPos-start+1-2)
+                         extractChunkSize(content.getContent(),start,content.length())
                 );
-                //含有结束符"/r/n，所有长度-2
+                //清空
                 content.clear();
-                //多读了
-                if(checkPos < start+len-1){
-                    chunkSize = chunkSize - ( len - (checkPos - start+1) );
-                    content.append(contentArr,checkPos+1, len - (checkPos - start+1));
-                }
-
 
             } else{
-                //当未校验到结尾时，全部加入content中
-                content.append(contentArr,start, checkPos-start+1);   //追加
-                return false ;      //未处理完成
+                //当未校验到结尾时，全部加入content中 用以下次验证
+                content.append(contentArr,start, len);   //追加
             }
+        } else{
+
+
+
         }
         //获取本次check的位置
         int checkPos = verifyBody.verify(contentArr,start,len);
@@ -59,7 +57,9 @@ public class ReqBodyHandler {
     private Integer extractChunkSize(byte[] content,int start,int len){
         int result = 0;
         for(int i = start; i < len ; i ++){
-            result = result * 16 + ( (char)content[i] - '0');
+            if(content[i] != 0x0d && content[i] != 0x0a){       //不等于cr和lf的字符，其以该字符结尾
+                result = result * 16 + ( (char)content[i] - '0');
+            }
         }
         return result;
     }
