@@ -4,9 +4,9 @@ import java.util.Stack;
 
 public class HttpVerityEnd {
 
-    private Stack<Character> verifyStack;
-    private boolean verifyState; //是否激活
-    private Stack<Character> successStack;  //成功匹配的
+    private Stack<Byte> verifyStack;
+    private boolean verifyState; //是否继续验证
+    private Stack<Byte> successStack;  //成功匹配的
 
 
     public HttpVerityEnd(String regString){
@@ -14,10 +14,10 @@ public class HttpVerityEnd {
     }
 
     public HttpVerityEnd(char[] regCharArr){
-        successStack = new Stack<Character>(); //储存成功字符串
-        verifyStack = new Stack<Character>();
+        successStack = new Stack<Byte>(); //储存成功字符串
+        verifyStack = new Stack<Byte>();
         for(char c:regCharArr){
-            verifyStack.push(c);
+            verifyStack.push((byte)c);
         }
         verifyState = false;    //验证器状态
     }
@@ -28,10 +28,10 @@ public class HttpVerityEnd {
      * @param start
      * @return 若匹配到的字符串位置
      */
-    public Integer verify(char[] arr, int start,int len){
+    public Integer verify(byte[] arr, int start,int len){
         int i ;
         for(i = 0; i<len;i++ ){
-            char temp = arr[start+i];
+            byte temp = arr[start+i];
             if( temp == verifyStack.peek()){
                 successStack.push( verifyStack.pop() );  //相等则出栈
                 verifyState = true ; //激活状态
@@ -68,7 +68,7 @@ public class HttpVerityEnd {
      * @return 是否验证成功
      */
     public boolean getResult(){
-        return verifyStack.size() == 0 ? true : false;
+        return verifyStack.size() == 0 ;
     }
 
 

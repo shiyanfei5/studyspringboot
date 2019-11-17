@@ -1,6 +1,11 @@
 package http;
 
+import util.HttpUtil;
+
 import java.util.HashMap;
+import java.util.Map;
+
+import static util.ByteUtil.byteArrayAppend;
 
 public class ReqHeaderHandler {
 
@@ -12,6 +17,10 @@ public class ReqHeaderHandler {
     private ReqBodyHandler nextHandler;
     private HttpVerityEnd verifyHeader = new HttpVerityEnd("\n\r\n\r");
 
+    public ReqHeaderHandler(Request request) {
+        this.request = request;
+    }
+
     public void setFinish(boolean finish) {
         isFinish = finish;
     }
@@ -19,48 +28,38 @@ public class ReqHeaderHandler {
     public void setNextHandler(ReqBodyHandler nextHandler) {
         this.nextHandler = nextHandler;
     }
-    public void setRequest(Request request) {
-        this.request = request;
-    }
 
-    public Boolean process(char[] contentArr, int start,int len,StringBuilder content){
+    public Integer process(byte[] contentArr, int start,int len,ByteAccumulation content){
+        //若未完成，首先进行校验
+        int checkPos = verifyHeader.verify(contentArr,start,len);
+        //说明已经校验到结尾了
+        if (verifyHeader.getResult()) {
+            int checkLength = checkPos-start+1;
+            content.append(contentArr, start, checkLength);
 
-        //若请求头完成校验，责任链直接传给ReqBodyHandler处理
-        if(isFinish){
-            return nextHandler.process(contentArr,start,len,content);
+            //设置请求头的map
+            Map<String,String> reqHeaderMap =
+                    HttpUtil.contentTransformHeaderMap(content.getContent());  //将content字符串转为map
+            request.setReqHeader(reqHeaderMap);
+            //清空累计内容,迎接请求体解析
+            content.clear();
+
+            // 设置属性
+            Integer length = request.getReqHeader().get("Content-Length") == null?
+                    null:Integer.parseInt(
+                    request.getReqHeader().get("Content-Length")
+            );
+            request.setContentLength(length); //length有值或未null
+            request.setChunck(
+                    "chunked".equals( request.getReqHeader().get("Transfer-Encoding") )
+            );
+            //推进处理状态
+            request.setReqState(Request.State.BODY);
         } else {
-            //若未完成，首先进行校验
-            int checkPos = verifyHeader.verify(contentArr,start,len);
-            //说明结尾再该字符数组中
-            if (verifyHeader.getResult()) {
-                content.append(contentArr, start, checkPos+1);
-                setFinish(true);    //表明已完成校验
-                request.contentTransformHeaderMap(content);  //将content字符串转为map
-
-                //判断请求类型
-                String type = request.getReqHeader().get("method");
-                if("GET".equals(type)){
-                    //若为GET请求，仅仅有请求头
-                    return true;
-                }
-
-                //是否包含请求体长度
-                Integer length = Integer.parseInt(
-                        request.getReqHeader().get("Content-Length")
-                );
-                nextHandler.setLength(length); //length有值或未null
-
-                // 当checkPos 小于最后一个字节，说明一部分字节时请求体的，首先对其检查
-                if (checkPos < len-1) {
-                    return nextHandler.process
-                            (contentArr, checkPos+1, len - checkPos -1,content);
-                }
-
-            } else {
-                content.append(contentArr, start, checkPos+1); //加入内容
-            }
+            content.append(contentArr,start, checkPos-start+1); //加入内容
         }
-        return false;
+        return checkPos;
+
     }
 
 
