@@ -2,6 +2,7 @@ package http;
 
 import com.sun.net.httpserver.HttpServer;
 import myhttp.HttpRequest;
+import sun.net.www.http.HttpClient;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -74,18 +75,21 @@ public class Request {
         ReqBodyHandler bodyHandler = new ReqBodyHandler(this);
         reqhandler.setNextHandler(bodyHandler);
         ByteAccumulation content = new ByteAccumulation();   //content累加
-        in.read()
 
-        while(reqState != State.FINISH ){
-            //进行请求头处理
+
+        //读取一次
+        while( (len = in.read(buffer)) != -1 ){
+            waitProcessStartPos = 0 ; //每次read完待处理位置都为0
+
+            //若等待请求头的处理，则处理
             if(reqState == State.HEADER){
-                len = in.read(buffer);
                 Integer processPos =
-                        reqhandler.process(buffer,0,len,content);    //每次处理一个buffer大小的内容
+                        reqhandler.process(buffer,waitProcessStartPos,len,content);    //每次处理一个buffer大小的内容
+                waitProcessStartPos = processPos + 1;
+                len = len-(processPos+1); //剩余长度
                 //当请求头校验结束后，若该buffer即包含请求头，又包含请求体
-                if(reqState == State.BODY && processPos < len - 1 ){
-                    waitProcessStartPos = processPos+1 ;
-                    len = len-(processPos+1);
+                if(reqState != State.BODY || len <= 0 ){   //待处理报文
+                    continue;
                 }
             }
             if(reqState == State.BODY) {
@@ -94,31 +98,46 @@ public class Request {
                     reqState = State.FINISH;
                     break;
                 }
-                //查看是否存在待处理报文（分割或其他所致）
-                if(waitProcessStartPos == null){
-                    len = in.read(buffer);  //更新buffer
-                    waitProcessStartPos = 0;
-                }
                 //选择处理模式,byteLength存在时用此模式
                 if(isChunck ){
+                    while(true){
+                        if(chunkSize == null ){
+                            Integer processPos =
+                                    bodyHandler.processChunkSize(buffer,waitProcessStartPos,len,content);
+                            waitProcessStartPos = processPos + 1;
+                            len = len-(processPos+1); //剩余长度
+                            if(chunkSize == 0){
+                                reqState = State.FINISH;
+                            }
+                        }
+                        else {
+                            if(len > 0){
+                                if(len>chunkSize){  //剩余大于chunksize
+                                    content.append(buffer,waitProcessStartPos,chunkSize);
+                                    chunkSize = 0;
+                                    len = len - chunkSize;
+                                }else{
+                                    content.append(buffer,waitProcessStartPos,len);
+                                    chunkSize = chunkSize - len;
+                                    len = 0;
+                                }
+                                if(chunkSize == 0 ){
+                                    content.
+                                }
 
-
+                            } else{
+                                continue;   //再读一个
+                            }
+                        }
+                    }
                 } else {
                     // 按照content-length进行处理
                     bodyHandler.processByContentLength(buffer,waitProcessStartPos,len,content);
-                    waitProcessStartPos = null; //表示没有待处理的了
                 }
-
-
-
-
             }
-
-
-
         }
         System.out.println("xx");
-
+        HttpClient
     }
 
 
