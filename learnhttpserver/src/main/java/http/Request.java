@@ -2,6 +2,8 @@ package http;
 
 import com.sun.net.httpserver.HttpServer;
 import myhttp.HttpRequest;
+import org.apache.coyote.ProtocolHandler;
+import sun.net.httpserver.HttpServerImpl;
 import sun.net.www.http.HttpClient;
 
 import java.io.*;
@@ -75,12 +77,11 @@ public class Request {
         ReqBodyHandler bodyHandler = new ReqBodyHandler(this);
         reqhandler.setNextHandler(bodyHandler);
         ByteAccumulation content = new ByteAccumulation();   //content累加
-
+        ByteAccumulation chunkContent = new ByteAccumulation(); //chunkSize字节累加
 
         //读取一次
         while( (len = in.read(buffer)) != -1 ){
             waitProcessStartPos = 0 ; //每次read完待处理位置都为0
-
             //若等待请求头的处理，则处理
             if(reqState == State.HEADER){
                 Integer processPos =
@@ -96,37 +97,28 @@ public class Request {
                 //开始解析请求体之前，首先判断是否为get请求，get无请求体
                 if( "GET".equals( reqHeader.get("method"))){
                     reqState = State.FINISH;
-                    break;
                 }
                 //选择处理模式,byteLength存在时用此模式
                 if(isChunck ){
                     while(true){
-                        if(chunkSize == null ){
-                            Integer processPos =
-                                    bodyHandler.processChunkSize(buffer,waitProcessStartPos,len,content);
-                            waitProcessStartPos = processPos + 1;
-                            len = len-(processPos+1); //剩余长度
-                            if(chunkSize == 0){
-                                reqState = State.FINISH;
-                            }
+                        if(len <= 0 || reqState.equals( State.FINISH) ){
+                            //退出条件
+                            break;
                         }
-                        else {
-                            if(len > 0){
-                                if(len>chunkSize){  //剩余大于chunksize
-                                    content.append(buffer,waitProcessStartPos,chunkSize);
-                                    chunkSize = 0;
-                                    len = len - chunkSize;
-                                }else{
-                                    content.append(buffer,waitProcessStartPos,len);
-                                    chunkSize = chunkSize - len;
-                                    len = 0;
+                        else{
+                            if(chunkSize == null ){
+                                Integer processPos =
+                                        bodyHandler.processChunkSize(buffer,waitProcessStartPos,len,chunkContent);
+                                waitProcessStartPos = processPos + 1;
+                                len = len-(processPos+1); //剩余长度
+                                if(chunkSize == 0){
+                                    reqState = State.FINISH;
                                 }
-                                if(chunkSize == 0 ){
-                                    content.
-                                }
+                            }
+                            if(chunkSize != null) {  //说明已经拿到了chunkSize
+                                //To-Do读取chunkSize的body内容
 
-                            } else{
-                                continue;   //再读一个
+                                chunkSize = null;
                             }
                         }
                     }
@@ -135,9 +127,11 @@ public class Request {
                     bodyHandler.processByContentLength(buffer,waitProcessStartPos,len,content);
                 }
             }
+            if(reqState.equals(State.FINISH)){
+                break;
+            }
         }
         System.out.println("xx");
-        HttpClient
     }
 
 

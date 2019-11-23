@@ -11,15 +11,7 @@ public class ReqBodyHandler {
     public ReqBodyHandler(Request request) {
         this.request = request;
     }
-
-    public void setLength(Integer length) {
-        this.length = length;
-    }
-    public void setChunked(Boolean chunked) {
-        isChunked = chunked;
-    }
-
-
+    
     public Integer processChunkSize(byte[] contentArr, int start, int len, ByteAccumulation content) {
 
         //chunk模式下，首先判断是否已经提取出该chunk的大小，则通过httpverify验证\r\
