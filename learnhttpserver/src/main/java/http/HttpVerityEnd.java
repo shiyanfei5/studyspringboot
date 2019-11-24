@@ -71,5 +71,10 @@ public class HttpVerityEnd {
         return verifyStack.size() == 0 ;
     }
 
+    public void refresh(){
+        verifyState = false;
+        resetStack();
+    }
+
 
 }

@@ -39,10 +39,11 @@ public class ReqHeaderHandler {
 
             //设置请求头的map
             Map<String,String> reqHeaderMap =
-                    HttpUtil.contentTransformHeaderMap(content.getContent());  //将content字符串转为map
+                    HttpUtil.contentTransformHeaderMap(
+                            content.consume()
+                    );  //消费 积累的字节内容
             request.setReqHeader(reqHeaderMap);
-            //清空累计内容,迎接请求体解析
-            content.clear();
+
 
             // 设置属性
             Integer length = request.getReqHeader().get("Content-Length") == null?

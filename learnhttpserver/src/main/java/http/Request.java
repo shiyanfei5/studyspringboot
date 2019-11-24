@@ -22,8 +22,9 @@ public class Request {
     private Integer byteLength;  //contentLength字段，为null表示不用，
     private Boolean isChunck;   //通过chunked传输
     private Integer chunkSize;  // chunk的大小
+
     enum State{HEADER,BODY,FINISH}
-    private State reqState;
+    private State reqState ;
 
 
 
@@ -55,23 +56,26 @@ public class Request {
     public Integer getByteLength() {
         return byteLength;
     }
-
     public Boolean getChunck() {
         return isChunck;
     }
-
     public Integer getChunkSize() {
         return chunkSize;
     }
+
+
+
 
     public Request(Socket socket) throws Exception {
         this(socket.getInputStream());
     }
 
     public Request(InputStream in ) throws  Exception{
-        byte[] buffer = new byte[1024];     //待处理报文缓冲区
-        Integer waitProcessStartPos = null;  //储存待处理的报文处的起始位置
-        Integer len = null ;    //储存待处理的报文长度
+        reqState = State.HEADER;
+        byte[] buffer = new byte[100];     //待处理报文缓冲区
+
+        Integer waitProcessStartPos ;  //储存待处理的报文处的起始位置
+        Integer len  ;    //储存待处理的报文长度
 
         ReqHeaderHandler reqhandler = new ReqHeaderHandler(this);
         ReqBodyHandler bodyHandler = new ReqBodyHandler(this);
@@ -81,22 +85,22 @@ public class Request {
 
         //读取一次
         while( (len = in.read(buffer)) != -1 ){
-            waitProcessStartPos = 0 ; //每次read完待处理位置都为0
+            waitProcessStartPos = 0 ; //每次待处理位置都为0
+
             //若等待请求头的处理，则处理
-            if(reqState == State.HEADER){
+            if(reqState.equals(State.HEADER)){
                 Integer processPos =
                         reqhandler.process(buffer,waitProcessStartPos,len,content);    //每次处理一个buffer大小的内容
+                len = len-(processPos-waitProcessStartPos+1); //剩余长度
                 waitProcessStartPos = processPos + 1;
-                len = len-(processPos+1); //剩余长度
+
                 //当请求头校验结束后，若该buffer即包含请求头，又包含请求体
-                if(reqState != State.BODY || len <= 0 ){   //待处理报文
-                    continue;
-                }
             }
-            if(reqState == State.BODY) {
+            if(reqState.equals(State.BODY)) {
                 //开始解析请求体之前，首先判断是否为get请求，get无请求体
                 if( "GET".equals( reqHeader.get("method"))){
                     reqState = State.FINISH;
+                    break;
                 }
                 //选择处理模式,byteLength存在时用此模式
                 if(isChunck ){
@@ -108,17 +112,24 @@ public class Request {
                         else{
                             if(chunkSize == null ){
                                 Integer processPos =
-                                        bodyHandler.processChunkSize(buffer,waitProcessStartPos,len,chunkContent);
+                                        bodyHandler.processChunkSize(buffer,waitProcessStartPos,len,content);
+
+                                len = len-(processPos-waitProcessStartPos+1); //剩余长度
                                 waitProcessStartPos = processPos + 1;
-                                len = len-(processPos+1); //剩余长度
-                                if(chunkSize == 0){
+
+                                if(chunkSize == 0+2){   //算上分隔符,此时完成
                                     reqState = State.FINISH;
+                                    break;
                                 }
                             }
                             if(chunkSize != null) {  //说明已经拿到了chunkSize
                                 //To-Do读取chunkSize的body内容
+                                Integer processPos = bodyHandler.processChunkBody(
+                                        buffer,waitProcessStartPos,len,chunkContent
+                                );
+                                len = len-(processPos-waitProcessStartPos+1); //剩余长度
+                                waitProcessStartPos = processPos  +1 ; //下次起始位置
 
-                                chunkSize = null;
                             }
                         }
                     }
@@ -138,22 +149,20 @@ public class Request {
 
 
 
-    public static void main(String[] args) {
-        try {
+    public static void main(String[] args) throws  Exception{
+
             ServerSocket server = new ServerSocket(20000);
             while (true) {
+                try {
                 Socket socket = server.accept();
                 System.out.println("-----------请求已进入xxx");
                 Request request = new Request(socket);
                 System.out.println(request.getReqHeader());
-                System.out.println(new String(request.getReqBody()));
                 System.out.println("开始下一个");
+                } catch ( Exception e){
+                    e.printStackTrace();
+                }
             }
-        } catch ( Exception e){
-            e.printStackTrace();
-        }
-
-
 
 
    }
