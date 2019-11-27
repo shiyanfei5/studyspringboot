@@ -4,14 +4,13 @@ import static util.ByteUtil.byteArrayAppend;
 
 public class ReqBodyHandler {
 
-
     private HttpVerityEnd verifyBody = new HttpVerityEnd("\n\r");
     private Request request;
 
     public ReqBodyHandler(Request request) {
         this.request = request;
     }
-    
+
     public Integer processChunkSize(byte[] contentArr, int start, int len, ByteAccumulation content) {
 
         //chunk模式下，首先判断是否已经提取出该chunk的大小，则通过httpverify验证\r\

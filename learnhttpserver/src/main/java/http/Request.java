@@ -18,7 +18,6 @@ public class Request {
     private Map<String,String> reqHeader;   //请求参数比存在可能为null
     private byte[] reqBody;     //请求体 ，byte类型用户自己赚
 
-
     private Integer byteLength;  //contentLength字段，为null表示不用，
     private Boolean isChunck;   //通过chunked传输
     private Integer chunkSize;  // chunk的大小
@@ -28,7 +27,7 @@ public class Request {
 
 
 
-
+    //***************************bean对应的方法***********************************
     public void setByteLength(Integer contentLength) {
         this.byteLength = contentLength;
     }
@@ -63,7 +62,14 @@ public class Request {
         return chunkSize;
     }
 
-
+    /**
+     * 获取请求头的属性，不存在返回null
+     * @param attribute
+     * @return
+     */
+    public String getHeader(String attribute){
+        return reqHeader.get(attribute);
+    }
 
 
     public Request(Socket socket) throws Exception {
@@ -80,28 +86,22 @@ public class Request {
         ReqHeaderHandler reqhandler = new ReqHeaderHandler(this);
         ReqBodyHandler bodyHandler = new ReqBodyHandler(this);
         reqhandler.setNextHandler(bodyHandler);
-        ByteAccumulation content = new ByteAccumulation();   //content累加
-        ByteAccumulation chunkContent = new ByteAccumulation(); //chunkSize字节累加
+        ByteAccumulation contentHeaderOrSize = new ByteAccumulation();   //content累加
+        ByteAccumulation content = new ByteAccumulation(); //chunkSize字节累加
 
         //读取一次
         while( (len = in.read(buffer)) != -1 ){
             waitProcessStartPos = 0 ; //每次待处理位置都为0
 
-            //若等待请求头的处理，则处理
+            //若等待请求头的处理
             if(reqState.equals(State.HEADER)){
                 Integer processPos =
-                        reqhandler.process(buffer,waitProcessStartPos,len,content);    //每次处理一个buffer大小的内容
+                        reqhandler.process(buffer,waitProcessStartPos,len,contentHeaderOrSize);    //每次处理一个buffer大小的内容
                 len = len-(processPos-waitProcessStartPos+1); //剩余长度
                 waitProcessStartPos = processPos + 1;
-
                 //当请求头校验结束后，若该buffer即包含请求头，又包含请求体
             }
             if(reqState.equals(State.BODY)) {
-                //开始解析请求体之前，首先判断是否为get请求，get无请求体
-                if( "GET".equals( reqHeader.get("method"))){
-                    reqState = State.FINISH;
-                    break;
-                }
                 //选择处理模式,byteLength存在时用此模式
                 if(isChunck ){
                     while(true){
@@ -112,7 +112,7 @@ public class Request {
                         else{
                             if(chunkSize == null ){
                                 Integer processPos =
-                                        bodyHandler.processChunkSize(buffer,waitProcessStartPos,len,content);
+                                        bodyHandler.processChunkSize(buffer,waitProcessStartPos,len,contentHeaderOrSize);
 
                                 len = len-(processPos-waitProcessStartPos+1); //剩余长度
                                 waitProcessStartPos = processPos + 1;
@@ -123,9 +123,8 @@ public class Request {
                                 }
                             }
                             if(chunkSize != null) {  //说明已经拿到了chunkSize
-                                //To-Do读取chunkSize的body内容
                                 Integer processPos = bodyHandler.processChunkBody(
-                                        buffer,waitProcessStartPos,len,chunkContent
+                                        buffer,waitProcessStartPos,len,content
                                 );
                                 len = len-(processPos-waitProcessStartPos+1); //剩余长度
                                 waitProcessStartPos = processPos  +1 ; //下次起始位置

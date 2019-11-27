@@ -43,8 +43,6 @@ public class ReqHeaderHandler {
                             content.consume()
                     );  //消费 积累的字节内容
             request.setReqHeader(reqHeaderMap);
-
-
             // 设置属性
             Integer length = request.getReqHeader().get("Content-Length") == null?
                     null:Integer.parseInt(
@@ -54,8 +52,12 @@ public class ReqHeaderHandler {
             request.setChunck(
                     "chunked".equals( request.getReqHeader().get("Transfer-Encoding") )
             );
-            //推进处理状态
-            request.setReqState(Request.State.BODY);
+            //推进处理状态,get请求无请求体
+            if( "GET".equals( reqHeaderMap.get("method"))){
+                request.setReqState(Request.State.FINISH);
+            }else{
+                request.setReqState(Request.State.BODY);
+            }
         } else {
             content.append(contentArr,start, checkPos-start+1); //加入内容
         }
