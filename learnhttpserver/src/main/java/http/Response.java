@@ -82,15 +82,11 @@ public class Response {
         //2.进行content-encoding,对 content字节进行编码
         setContentLength(content.length);
 
-
-
-
-
-
     }
 
 
-    }
+
+}
 
 
 
