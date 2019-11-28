@@ -36,8 +36,9 @@ public class Response {
     private static final String CRLF = "\r\n";
     private static final Integer BufferSize = 1024;  //单位是字节
 
-    public Response(OutputStream socketOut){
+    public Response(OutputStream socketOutStream){
         headersMap = new HashMap<>();
+        socketOut = socketOutStream;
     }
 
     public void setRespHeader(String key , String value){
@@ -78,13 +79,14 @@ public class Response {
 
         StringBuilder sb = new StringBuilder();
         //首行
-        sb.append(status.toString()).append(BLANK).append(httpVersion).append(BLANK).append(statusInfo).append(CRLF);
+        sb.append(httpVersion).append(BLANK).append(status.toString()).append(BLANK).append(statusInfo).append(CRLF);
         for(String key:headersMap.keySet()){
             sb.append(key);
             sb.append(":"+BLANK);
             sb.append(headersMap.get(key));
             sb.append(CRLF);
         }
+        sb.append(CRLF);
         return sb.toString();
     }
 
@@ -164,12 +166,14 @@ public class Response {
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(this.socketOut);
 
 
-        byte[] head = formatRespHeadString().getBytes();
+
         // 将内存中对象进行编码为byte数组
         InputStreamReader in = new InputStreamReader(
-                new FileInputStream("D:/测试/新建文本文档.sql")
+                new FileInputStream("E:/idla_java_project/studyspringboot/learnhttpserver/src/main/resources/test.xml")
         );
+
         byte[] res =  formBodyLength(in,"utf-8");
+        byte[] head = formatRespHeadString().getBytes();
         bufferedOutputStream.write(head);
         bufferedOutputStream.write(res );
         bufferedOutputStream.flush();
@@ -195,7 +199,20 @@ public class Response {
 
     }
 
+    public static void method2(String srcString, String destString)
+            throws IOException {
+        FileInputStream fis = new FileInputStream(srcString);
+        FileOutputStream fos = new FileOutputStream(destString);
 
+        byte[] bys = new byte[1024];
+        int len = 0;
+        while ((len = fis.read(bys)) != -1) {
+            fos.write(bys, 0, len);
+        }
+
+        fos.close();
+        fis.close();
+    }
 
 }
 
