@@ -157,7 +157,14 @@ public class Request {
                 System.out.println("-----------请求已进入xxx");
                 Request request = new Request(socket);
                 System.out.println(request.getReqHeader());
+                Response resp = new Response(socket.getOutputStream());
+                //设置响应头
+                resp.setStatusLine(200);
+                // 设置响应传输编码（可为空）
+                resp.setRespHeader("Content-Encoding","deflate");
+                resp.send();
                 System.out.println("开始下一个");
+
                 } catch ( Exception e){
                     e.printStackTrace();
                 }

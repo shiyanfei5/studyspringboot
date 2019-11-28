@@ -1,8 +1,13 @@
 package http;
 
+import compress.HttpCompressFactory;
+import compress.HttpDeflate;
+import compress.HttpGzip;
+import compress.ICompress;
 import constants.HttpConstant;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,39 +25,53 @@ public class Response {
     private Integer size;   //chunk模式即为每个chunk大小，content-length即为lenth大小
     private byte[] bodyContent;
 
+    // 该响应对应的请求
+    private Request request;
+    private OutputStream socketOut;
+
+
+
     // http响应配置表
     private static final String  BLANK = " ";
     private static final String CRLF = "\r\n";
     private static final Integer BufferSize = 1024;  //单位是字节
 
-    public Response(){
-        setStatusLine(200);
+    public Response(OutputStream socketOut){
+        headersMap = new HashMap<>();
     }
 
     public void setRespHeader(String key , String value){
         headersMap.put(key,value);
     }
-    private void setStatusLine(Integer statusCode){
+    public void setStatusLine(Integer statusCode){
         status = statusCode;
         statusInfo  = HttpConstant.StatusInfoMap.get(statusCode);
     }
-
     public void setContentEncoding(String encoding){
         setRespHeader("Content-Encoding",encoding);
     }
-
     public void setContentLength(Integer length){
         String len = length==null? null:length.toString();
         setRespHeader("Content-Length",len);
     }
 
+    /**
+     * @param type
+     * @param charset 字符集编码，可以传null，即此时没有字符集
+     */
     public void setContentType(String type, String charset){
         StringBuilder sb = new StringBuilder();
-        sb.append(type);
-        sb.append(";");
-        sb.append("charset=");
-        sb.append(charset);
-        setRespHeader("Content-Type",sb.toString());
+        if(type != null ){
+            sb.append(type);
+        }
+        if(charset != null ){
+            sb.append(";");
+            sb.append("charset=");
+            sb.append(charset);
+        }
+        if(sb.length() > 0 ){
+            setRespHeader("Content-Type",sb.toString());
+        }
     }
 
     public String formatRespHeadString(){
@@ -70,17 +89,109 @@ public class Response {
     }
 
     /**
-     * 要求传入的字节byte content已经经过了charset类型的编码
-     * @param content
-     * @param type
-     * @param charset
-     * @param byteEncoding
+     * @param compressedByteArr 等待被压缩的字节数据,其必须为完成的消息实体，否则有影响
+     * @return 返回字节数组
      */
-    public void formatBodyContentLength(byte[] content,String type,String charset,String byteEncoding){
-        //1.设置content-type
-        setContentType(type,charset);
-        //2.进行content-encoding,对 content字节进行编码
-        setContentLength(content.length);
+    public byte[] compressByteArr(byte[] compressedByteArr ){
+        ICompress compressor = HttpCompressFactory.getInstance().produce( headersMap.get("Content-Encoding")  );
+        if(compressor != null){
+            try{
+                compressedByteArr = compressor.compress(compressedByteArr);
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        return compressedByteArr;
+    }
+
+    /**
+     * 读入字节流
+     * @param in
+     * @return 返回消息传输后body
+     */
+    public byte[] formBodyLength(InputStream in){
+        ByteArrayOutputStream byteArr = new ByteArrayOutputStream(); //储存内容
+        byte[] buff = new byte[1024];
+        int len ;
+        byte[] result = null ;
+        try{
+            while( (len = in.read(buff,0,1024)) != -1){
+                byteArr.write(buff,0,len);
+            }
+            result = formBodyLength(byteArr.toByteArray());
+            byteArr.flush();
+            byteArr.close();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        return result;
+    }
+    /**
+     * 读入字符流,charset为预期编码
+     * @param reader
+     * @return 返回消息传输后body
+     */
+    public byte[] formBodyLength(Reader reader,  String charset){
+        char[] buffer  = new char[1024];
+        StringBuilder sb = new StringBuilder();
+        int len ;
+        byte[] res  = null;
+        try{
+            while( (len = reader.read(buffer,0,1024)) != -1){
+                sb.append(buffer,0,len);
+            }
+            res = sb.toString().getBytes(charset);
+        } catch (Exception e ){
+            e.printStackTrace();
+        }
+        return formBodyLength(res);
+    }
+    /**
+     * 读入字节数组
+     * @param bodyContent
+     * @return 返回消息传输后body
+     */
+    public byte[] formBodyLength(byte[] bodyContent){
+        bodyContent = compressByteArr(bodyContent);
+        setContentLength(bodyContent.length);
+        return bodyContent;
+    }
+
+
+
+    public void send() throws Exception{
+
+        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(this.socketOut);
+
+
+        byte[] head = formatRespHeadString().getBytes();
+        // 将内存中对象进行编码为byte数组
+        InputStreamReader in = new InputStreamReader(
+                new FileInputStream("D:/测试/新建文本文档.sql")
+        );
+        byte[] res =  formBodyLength(in,"utf-8");
+        bufferedOutputStream.write(head);
+        bufferedOutputStream.write(res );
+        bufferedOutputStream.flush();
+
+
+    }
+
+    public static void main(String[] args) throws Exception{
+//        Response response = new Response();
+//        ICompress compress = new HttpDeflate();
+//        //设置响应头
+//        response.setStatusLine(200);
+//        // 设置响应传输编码（可为空）
+//        response.setRespHeader("Content-Encoding","deflate");
+//
+//        // 对byte进行压缩
+//        System.out.println(res.length);
+//        byte[] orgin = compress.decompress(res);
+//        System.out.println(orgin.length);
+//        System.out.println(new String(orgin));
+
+
 
     }
 
