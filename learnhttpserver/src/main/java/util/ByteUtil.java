@@ -1,5 +1,7 @@
 package util;
 
+import java.nio.ByteBuffer;
+
 public class ByteUtil {
 
 
@@ -28,6 +30,21 @@ public class ByteUtil {
                 len
         );
         return newDesByte;
+    }
+
+    /**
+     * 消费byteBuffer中所有的数据，消费完成后 进入初始化状态等待写入
+     * @param buffer ByteBuffer读取
+     * @return
+     */
+    public static  byte[] readAllByteBuffer(ByteBuffer buffer){
+        // flip方法将Buffer从写模式切换到读模式。调用flip()方法会将position设回0，并将limit设置成之前position的值。
+        buffer.flip();
+        byte[] result = new byte[ buffer.limit()];  //获取结果集长度
+        buffer.get(result); //消费
+        // 初始化等待吸入
+        buffer.clear();
+        return result;
     }
 
 

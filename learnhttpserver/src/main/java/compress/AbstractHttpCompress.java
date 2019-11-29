@@ -13,9 +13,9 @@ public abstract class AbstractHttpCompress implements ICompress{
     public abstract void decompress(InputStream in , OutputStream out) throws IOException;
 
 
-    public byte[] compress(byte[] data) throws IOException {
+    public byte[] compress(byte[] data,int offset,int len) throws IOException {
         //输入待压缩byte数组
-        ByteArrayInputStream byteIn = new ByteArrayInputStream(data);
+        ByteArrayInputStream byteIn = new ByteArrayInputStream(data,offset,len);
         //结果
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
 
@@ -44,8 +44,8 @@ public abstract class AbstractHttpCompress implements ICompress{
 
 
     //**********************解压，输入的为压缩过的二进制数据******************//
-    public byte[] decompress(byte[] data)  throws IOException{
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
+    public byte[] decompress(byte[] data,int offset, int len)  throws IOException{
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data,offset,len);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         //创建两个ByteArray字节流
         decompress(byteArrayInputStream,byteArrayOutputStream);

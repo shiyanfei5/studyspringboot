@@ -8,10 +8,17 @@ import constants.HttpConstant;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ * -----------------
+ *
+ * ----------------
+ */
 public class Response {
     // 响应首行属性 默认200了
     private Integer status = 200;
@@ -20,21 +27,19 @@ public class Response {
     //http header 字段,
     private Map<String, String> headersMap;  //headerMap 里 仅仅存储唯一的属性，即一个响应里面只能有一个该属性的 内容
     private List<String> cookie;   //cookie,一个响应里面可包含多个cookie属性，单独拎出来
-    //http body
-    private Integer chunkNum;       //chunkNum 为null表示使用content-length模式
-    private Integer size;   //chunk模式即为每个chunk大小，content-length即为lenth大小
-    private byte[] bodyContent;
 
     // 该响应对应的请求
     private Request request;
+    // socket流
     private OutputStream socketOut;
-
-
-
+    // 报文体缓冲区
+    private ByteBuffer bodyBuffer;
+    // chunk模式下
+    private Integer chunkSize;   //chunk模式即为每个chunk大小，content-length即为lenth大小
     // http响应配置表
     private static final String  BLANK = " ";
     private static final String CRLF = "\r\n";
-    private static final Integer BufferSize = 1024;  //单位是字节
+    private static final Integer BufferSize = 2048;  //单位是字节
 
     public Response(OutputStream socketOutStream){
         headersMap = new HashMap<>();
@@ -55,7 +60,11 @@ public class Response {
         String len = length==null? null:length.toString();
         setRespHeader("Content-Length",len);
     }
-
+    public void initBodyByteBuffer(){
+        if(bodyBuffer == null){
+            ByteBuffer.allocate( BufferSize);
+        }
+    }
     /**
      * @param type
      * @param charset 字符集编码，可以传null，即此时没有字符集
@@ -94,8 +103,22 @@ public class Response {
      * @param compressedByteArr 等待被压缩的字节数据,其必须为完成的消息实体，否则有影响
      * @return 返回字节数组
      */
-    public byte[] compressByteArr(byte[] compressedByteArr ){
+    public byte[] compressBodyBuffer(){
+        byte[] result;
         ICompress compressor = HttpCompressFactory.getInstance().produce( headersMap.get("Content-Encoding")  );
+        if(compressor != null){
+            try{
+                result = compressor.compress(compressedByteArr);
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+
+    private byte[] compressByteArr(byte[] compressedByteArr,ICompress compressor ){
+
         if(compressor != null){
             try{
                 compressedByteArr = compressor.compress(compressedByteArr);
@@ -153,7 +176,36 @@ public class Response {
      * @param bodyContent
      * @return 返回消息传输后body
      */
-    public byte[] formBodyLength(byte[] bodyContent){
+    public byte[] setResponseBody(byte[] bodyContent){
+        initBodyByteBuffer();       //初始化缓冲区
+        byte[] result ;             //初始化结果集
+
+        //bodyBuffer写入次数
+        int num ;
+        if( bodyContent.length % bodyBuffer.capacity() == 0  ){
+            num = bodyContent.length/bodyBuffer.capacity();
+        } else{
+            num = bodyContent.length/bodyBuffer.capacity()+1;
+        }
+        //开始写入
+        int pos = 0;
+        for(int i = 0 ; i < num ; i++){
+            byte[] compressed =
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
         bodyContent = compressByteArr(bodyContent);
         setContentLength(bodyContent.length);
         return bodyContent;
