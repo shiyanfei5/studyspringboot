@@ -10,7 +10,7 @@ import java.util.zip.InflaterInputStream;
 /**
  * Http1.1中  GZIP 是指 GZIP 格式
  */
-public class HttpGzip extends AbstractHttpCompress{
+public class HttpGzip extends AbstractHttpCompress  implements ICompress {
 
     @Override
     public void compress(InputStream in , OutputStream os ) throws IOException {

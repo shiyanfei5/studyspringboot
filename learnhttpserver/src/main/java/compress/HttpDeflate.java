@@ -7,7 +7,7 @@ import java.util.zip.*;
 /**
  * Http1.1中deflate 是指 ZLIB 格式
  */
-public class HttpDeflate extends AbstractHttpCompress {
+public class HttpDeflate extends AbstractHttpCompress implements ICompress{
 
 
     @Override

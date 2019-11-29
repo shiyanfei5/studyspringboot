@@ -37,7 +37,7 @@ public class ByteUtil {
      * @param buffer ByteBuffer读取
      * @return
      */
-    public static  byte[] readAllByteBuffer(ByteBuffer buffer){
+    public static  byte[] consumeByteBuffer(ByteBuffer buffer){
         // flip方法将Buffer从写模式切换到读模式。调用flip()方法会将position设回0，并将limit设置成之前position的值。
         buffer.flip();
         byte[] result = new byte[ buffer.limit()];  //获取结果集长度

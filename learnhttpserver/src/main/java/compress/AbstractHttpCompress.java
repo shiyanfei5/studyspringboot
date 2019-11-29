@@ -6,7 +6,7 @@ import java.io.*;
  * HttpCompress类，模板模式进行 响应体的压缩于解压
  * 模板模式：定义出运行的基本步骤，抽象出要特异化的部分，继承类实现
  */
-public abstract class AbstractHttpCompress implements ICompress{
+public abstract class AbstractHttpCompress {
 
     static Integer BUFFERSIZE = 1024;
     public abstract void compress  (InputStream in , OutputStream out) throws IOException;

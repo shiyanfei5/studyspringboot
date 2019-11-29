@@ -117,11 +117,10 @@ public class Response {
     }
 
 
-    private byte[] compressByteArr(byte[] compressedByteArr,ICompress compressor ){
-
+    private byte[] compressByteArr(byte[] compressedByteArr,int offset, int len,ICompress compressor ){
         if(compressor != null){
             try{
-                compressedByteArr = compressor.compress(compressedByteArr);
+                compressedByteArr = compressor.compress(compressedByteArr,offset,len);
             } catch (IOException e){
                 e.printStackTrace();
             }
@@ -179,7 +178,9 @@ public class Response {
     public byte[] setResponseBody(byte[] bodyContent){
         initBodyByteBuffer();       //初始化缓冲区
         byte[] result ;             //初始化结果集
-
+        //获取本次的压缩器
+        ICompress compressor =
+                HttpCompressFactory.getInstance().produce( headersMap.get("Content-Encoding"));
         //bodyBuffer写入次数
         int num ;
         if( bodyContent.length % bodyBuffer.capacity() == 0  ){
@@ -190,7 +191,11 @@ public class Response {
         //开始写入
         int pos = 0;
         for(int i = 0 ; i < num ; i++){
-            byte[] compressed =
+            byte[] compressed = compressByteArr(bodyContent,pos,bodyBuffer.capacity(), compressor);
+            bodyBuffer.put(compressed); //存入缓冲器
+            if(bodyBuffer.remaining() <= 0 ){
+                
+            }
 
         }
 
