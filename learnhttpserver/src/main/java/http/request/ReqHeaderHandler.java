@@ -1,11 +1,10 @@
-package http;
+package http.request;
 
+import http.ByteAccumulation;
+import http.HttpVerityEnd;
 import util.HttpUtil;
 
-import java.util.HashMap;
 import java.util.Map;
-
-import static util.ByteUtil.byteArrayAppend;
 
 public class ReqHeaderHandler {
 
@@ -29,7 +28,7 @@ public class ReqHeaderHandler {
         this.nextHandler = nextHandler;
     }
 
-    public Integer process(byte[] contentArr, int start,int len,ByteAccumulation content){
+    public Integer process(byte[] contentArr, int start, int len, ByteAccumulation content){
         //若未完成，首先进行校验
         int checkPos = verifyHeader.verify(contentArr,start,len);
         //说明已经校验到结尾了

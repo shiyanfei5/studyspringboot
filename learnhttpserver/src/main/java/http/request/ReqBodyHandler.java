@@ -1,6 +1,8 @@
-package http;
+package http.request;
 
-import static util.ByteUtil.byteArrayAppend;
+import http.ByteAccumulation;
+import http.HttpVerityEnd;
+import http.request.Request;
 
 public class ReqBodyHandler {
 

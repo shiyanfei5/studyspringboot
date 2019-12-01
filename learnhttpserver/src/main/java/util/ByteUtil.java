@@ -47,5 +47,11 @@ public class ByteUtil {
         return result;
     }
 
+    public static void main(String[] args){
+        ByteBuffer byteBuffer = ByteBuffer.allocate(10);
+        byte[] a = new byte[]{1,2,3,4};
+        byteBuffer.put(a,0,0);
+    }
+
 
 }

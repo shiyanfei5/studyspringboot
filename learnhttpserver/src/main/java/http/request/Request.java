@@ -1,16 +1,11 @@
-package http;
+package http.request;
 
-import com.sun.net.httpserver.HttpServer;
-import myhttp.HttpRequest;
-import org.apache.coyote.ProtocolHandler;
-import sun.net.httpserver.HttpServerImpl;
-import sun.net.www.http.HttpClient;
+import http.ByteAccumulation;
+import http.response.Response;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.util.HashMap;
 import java.util.Map;
 
 public class Request {
@@ -151,6 +146,7 @@ public class Request {
     public static void main(String[] args) throws  Exception{
 
             ServerSocket server = new ServerSocket(20000);
+            int i = 0;
             while (true) {
                 try {
                 Socket socket = server.accept();
@@ -161,13 +157,20 @@ public class Request {
                 //设置响应头
                 resp.setStatusLine(200);
                 // 设置响应传输编码（可为空）
-                resp.setRespHeader("Content-Encoding","deflate");
-                resp.send();
+                resp.setContentEncoding("gzip");
+                if(i%2 == 0){
+                    resp.setTransferEncoding("chunked");
+                }
+                InputStream in = new FileInputStream(
+                        Request.class.getClassLoader().getResource("QQWhatsnew.txt").getPath());
+                resp.send(in);
                 System.out.println("开始下一个");
 
                 } catch ( Exception e){
                     e.printStackTrace();
                 }
+                i++;
+
             }
 
 

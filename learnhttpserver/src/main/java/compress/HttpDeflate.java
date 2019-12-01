@@ -35,15 +35,6 @@ public class HttpDeflate extends AbstractHttpCompress implements ICompress{
     }
 
     public static void main(String[] args) throws  Exception{
-        HttpDeflate a = new HttpDeflate();
-        String data = "0000007901qqqq.qq.qqqqqqqq0000002171779ad0dfdb4a4f9ac4be18ef3a78080837403181000drpc你好pqq";
-        System.out.println(data.getBytes().length);
-        byte[] compressData = a.compress(data.getBytes("utf-8"));
-        System.out.println(compressData.length);
-        System.out.println( new String( compressData,"utf-8") );
-        byte[] unCompressData = a.decompress(compressData);
-        System.out.println( new String( unCompressData,"utf-8") );
-
 
     }
 }
