@@ -35,22 +35,21 @@ public class Response {
     // 该响应对应的请求
     private Request request;
     // socket流
-    private OutputStream socketOut;
+    private BufferedOutputStream socketOut;
 
     // 是否进行chunk
     private boolean isChunk;
-    // 报文体缓冲区
-    private ByteBuffer bodyBuffer;
+
     // http响应配置表
     public static final String  BLANK = " ";
     public static final String CRLF = "\r\n";
-    public static final Integer BufferSize = 2048;  //单位是字节
+    public static final Integer BufferSize = 8092;  //单位是字节
 
 
 
     public Response(OutputStream socketOutStream){
         headersMap = new HashMap<>();
-        socketOut = socketOutStream;
+        socketOut = new BufferedOutputStream(socketOutStream);
     }
 
     public void setRespHeader(String key , String value){
@@ -128,6 +127,8 @@ public class Response {
             sender = new ResponseChunkSender(this);
         }
         sender.sendResponse(content);
+        socketOut.flush();
+
     }
     public void send(InputStream content ) throws Exception{
         IResponseSender sender = null;
@@ -137,6 +138,7 @@ public class Response {
             sender = new ResponseChunkSender(this);
         }
         sender.sendResponse(content);
+        socketOut.flush();
     }
     public void send(Reader content ) throws Exception{
         IResponseSender sender = null;
@@ -146,6 +148,7 @@ public class Response {
             sender = new ResponseChunkSender(this);
         }
         sender.sendResponse(content,contentCharset);
+        socketOut.flush();
     }
     public void send(String content ) throws Exception{
         IResponseSender sender = null;
@@ -155,6 +158,7 @@ public class Response {
             sender = new ResponseChunkSender(this);
         }
         sender.sendResponse(content,contentCharset);
+        socketOut.flush();
     }
 
 

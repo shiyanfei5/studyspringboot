@@ -151,20 +151,29 @@ public class Request {
                 try {
                 Socket socket = server.accept();
                 System.out.println("-----------请求已进入xxx");
+                long s1 =  System.currentTimeMillis();
                 Request request = new Request(socket);
-                System.out.println(request.getReqHeader());
+                long s2 = System.currentTimeMillis();
+                System.out.println("生成请求耗时:"+(s2-s1));
+
                 Response resp = new Response(socket.getOutputStream());
+
+
                 //设置响应头
                 resp.setStatusLine(200);
                 // 设置响应传输编码（可为空）
                 resp.setContentEncoding("gzip");
+                resp.setContentCharset("utf-8");
+                resp.setContentType("text/plain");
                 if(i%2 == 0){
                     resp.setTransferEncoding("chunked");
                 }
                 InputStream in = new FileInputStream(
                         Request.class.getClassLoader().getResource("QQWhatsnew.txt").getPath());
                 resp.send(in);
-                System.out.println("开始下一个");
+                long s3 = System.currentTimeMillis();
+                System.out.println("返回响应耗时:"+(s3-s2));
+                System.out.println("开始下一个"+i);
 
                 } catch ( Exception e){
                     e.printStackTrace();
